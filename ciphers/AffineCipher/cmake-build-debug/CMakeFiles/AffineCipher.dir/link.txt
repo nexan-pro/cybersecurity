@@ -1,1 +1,0 @@
-/usr/bin/cc -g   CMakeFiles/AffineCipher.dir/main.c.o CMakeFiles/AffineCipher.dir/Affine.c.o  -o AffineCipher 

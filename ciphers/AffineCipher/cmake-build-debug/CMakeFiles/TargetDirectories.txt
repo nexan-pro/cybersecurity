@@ -1,3 +1,0 @@
-/home/gilgamesh/C_CPP_projects/AffineCipher/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/gilgamesh/C_CPP_projects/AffineCipher/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/gilgamesh/C_CPP_projects/AffineCipher/cmake-build-debug/CMakeFiles/AffineCipher.dir

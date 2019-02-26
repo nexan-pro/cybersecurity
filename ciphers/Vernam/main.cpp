@@ -3,6 +3,8 @@
 #include <time.h>
 #include <sys/stat.h>
 
+#define KEY_SIZE 2000
+
 namespace {
   std::string& readFromFile(std::ifstream& in, std::string& contentOfFile) {
     in.seekg(0, std::ios::end);
@@ -13,7 +15,7 @@ namespace {
     return contentOfFile;
   }
 
-  inline bool exist (const std::string name) {
+  inline bool exist(const std::string name) {
     struct stat buffer;
     return (stat(name.c_str(), &buffer) == 0);
   }
@@ -34,9 +36,9 @@ public:
 int main() {
   srand(time(0));
   std::ifstream in("message.txt");
-  if (in && exist("key.txt") && exist("encrypted_msg.txt")) {
+  if (in && exist("key_for_decrypt.txt") && exist("encrypted_msg.txt")) {
     std::cout << "\"key.txt\" file and \"encrypted_msg.txt\" are exist, starting to decrypt\n";
-    std::ifstream fkey("key.txt");
+    std::ifstream fkey("key_for_decrypt.txt");
     std::ifstream fencrypted_MSG("encrypted_msg.txt");
     if (fkey && fencrypted_MSG) {
       std::string encryptedData;
@@ -51,19 +53,25 @@ int main() {
   }
   else {
     std::cout << "starting generating key\n";
-    std::ofstream out("key.txt");
+    std::ofstream out("key_for_encrypt.txt");
+    std::ofstream foutd("key_for_decrypt.txt");;
     std::string contentOfMSG;
     contentOfMSG = readFromFile(in, contentOfMSG);
     std::string key;
-    key.resize(contentOfMSG.size());
-    for (size_t c = 0; c < contentOfMSG.size(); c++)
+    key.resize(KEY_SIZE);
+    for (size_t c = 0; c < KEY_SIZE; c++)
       key[c] = rand() % 127 + 32;
-    std::cout << "generated key is: " << key << std::endl;
-    if (exist("key.txt")) {
-      out << key;
+    std::string encryptKey = key;
+    for (int i = 0; i < contentOfMSG.size(); i++)
+      encryptKey.erase(i, 1);
+    if (exist("key_for_encrypt.txt")) {
+      out << encryptKey;
+      foutd << key;
+      foutd.close();
       out.close();
-      std::cout << "Successfully, written to file \"key.txt\"\n";
+      std::cout << "Successfully, written to file \"key_for_encrypt.txt\"\n";
     } else std::cerr << "Error to create output file!\n";
+
     Vernam obj;
     std::string encryptedMSG = obj.encrypt(contentOfMSG, key);
     writeToFile(encryptedMSG, "encrypted_msg.txt");
@@ -78,4 +86,3 @@ inline std::string Vernam::encrypt(std::string& src_text, std::string& key) {
     encryptedMSG[c] = src_text[c] ^ key[c];
   return encryptedMSG;
 }
-

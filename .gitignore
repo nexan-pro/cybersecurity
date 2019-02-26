@@ -1,3 +1,5 @@
 ciphers/Two-square/build
 ciphers/Affine/.idea
-ciphers/Affine/cmake-build-debug
+ciphers/Affine/build
+ciphers/Vernam/cmake-build-debug
+ciphers/Vernam/cmake-build-release

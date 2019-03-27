@@ -12,28 +12,33 @@
 #include <time.h>
 #include <math.h>
 #include <iostream>
+#include <boost/multiprecision/cpp_int.hpp>
 
+typedef boost::multiprecision::cpp_int cpp_int_t;
 typedef ulong ulong8_t;
 
 class RSA {
 private:
-  ulong8_t m_p; // !< first input num
-  ulong8_t m_q; // !< second input num
-  ulong8_t m_n; // !< product of input prime nums
-  ulong8_t m_eFunc; // !< Euler func
+  cpp_int_t m_p; // !< first input num
+  cpp_int_t m_q; // !< second input num
+  cpp_int_t m_n; // !< product of input prime nums
+  cpp_int_t m_eFunc; // !< Euler func
   ulong8_t m_e; // !< open e
   ulong8_t m_d; // !< secret e
-  ulong8_t* src_sieve; // !< source sieve
+  cpp_int_t* src_sieve; // !< source sieve
   bool* sieve_mask; // !< mask with prime nums
   size_t m_cntOfPrimes = 0; // !< count of prime nums in mask
-  ulong8_t* getPrimeSequence(ulong8_t n);
+  cpp_int_t* getPrimeSequence(ulong8_t n);
   bool isPrime(ulong8_t max, ulong8_t min);
   bool* sieveOfEratosthenes(ulong8_t n);
-  ulong8_t findSecret_d();
+  cpp_int_t findSecret_d();
+  bool binarySearch(cpp_int_t*& lhs, size_t sizeOfArray, cpp_int_t k);
 public:
   explicit RSA(ulong8_t p, ulong8_t q);
-  std::string encrypt(ulong8_t*& src_text, size_t sizeOfArray);
-  bool binarySearch(ulong8_t*& lhs, size_t sizeOfArray, ulong8_t k);
+  cpp_int_t* encrypt(cpp_int_t*& src_text, size_t sizeOfArray);
+  cpp_int_t* decrypt(cpp_int_t*& encrypted_text, size_t sizeOfArray);
+  cpp_int_t* addSalt(cpp_int_t*& encrypted_text, size_t sizeOfArray, int secretNum);
+  cpp_int_t* rmSalt(cpp_int_t*& encrypted_text, size_t sizeOfArray);
   ~RSA() {
     delete[] src_sieve;
     delete[] sieve_mask;
@@ -41,8 +46,8 @@ public:
 };
 
 struct key {
-  ulong8_t lhs;
-  ulong8_t rhs;
+  cpp_int_t lhs;
+  cpp_int_t rhs;
 };
 
 

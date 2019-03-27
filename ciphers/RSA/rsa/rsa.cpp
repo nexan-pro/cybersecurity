@@ -17,15 +17,15 @@ bool RSA::isPrime(ulong8_t max, ulong8_t min) {
   } else return false;
 }
 
-ulong8_t* RSA::getPrimeSequence(ulong8_t n){
+cpp_int_t* RSA::getPrimeSequence(ulong8_t n){
   this->sieve_mask = sieveOfEratosthenes(n);
-  this->src_sieve = new ulong8_t[n + 1];
+  this->src_sieve = new cpp_int_t[n + 1];
   for (size_t c = 2; c <= n; c++)
     this->src_sieve[c] = c;
   for (size_t c = 2; c <= n; c++)
     if (this->sieve_mask[c])
       this->m_cntOfPrimes++;
-  auto prime_sieve = new ulong8_t[this->m_cntOfPrimes];
+  auto prime_sieve = new cpp_int_t[this->m_cntOfPrimes];
   int ecx = 0;
   for (size_t c = 2; c <= n; c++)
     if (sieve_mask[c]) {
@@ -40,7 +40,7 @@ ulong8_t* RSA::getPrimeSequence(ulong8_t n){
   return prime_sieve;
 }
 
-std::string RSA::encrypt(ulong8_t*& src_text, size_t sizeOfArray) {
+cpp_int_t* RSA::encrypt(cpp_int_t*& src_text, size_t sizeOfArray) {
   this->m_n = this->m_p * this->m_q;
   this->m_eFunc = (m_p - 1) * (m_q - 1);
   for (size_t c = 1; c < this->m_eFunc; c+=2)
@@ -65,13 +65,19 @@ std::string RSA::encrypt(ulong8_t*& src_text, size_t sizeOfArray) {
 #endif
 
   //TODO: work with text
-  std::string tmp;
+#ifdef DEBUG
+  std::cout << "[DEBUG | encrypt()] encrypted_text: ";
+#endif
   for (size_t c = 0; c < sizeOfArray; c++) {
-    src_text[c] = static_cast<ulong8_t>(pow(src_text[c], this->m_e)) % this->m_n;
-    tmp += std::to_string(src_text[c]) + " ";
+    src_text[c] = boost::multiprecision::pow(src_text[c], this->m_e) % this->m_n;
+#ifdef DEBUG
+    std::cout << src_text[c] << ' ';
+#endif
   }
-  /**********************************************************************************/
-  return tmp;
+#ifdef DEBUG
+  std::cout << std::endl;
+#endif
+  return src_text;
 }
 
 /*
@@ -94,7 +100,7 @@ bool* RSA::sieveOfEratosthenes(ulong8_t n) {
  * @brief: Binary search is a search algorithm that finds the position of a target value within a sorted array.
  * @see: https://en.wikipedia.org/wiki/Binary_search_algorithm
  */
-bool RSA::binarySearch(ulong8_t*& lhs, size_t sizeOfArray, ulong8_t k) {
+bool RSA::binarySearch(cpp_int_t*& lhs, size_t sizeOfArray, cpp_int_t k) {
   uint32_t start = 0;
   uint32_t end = sizeOfArray;
   int mid = 0;
@@ -110,9 +116,9 @@ bool RSA::binarySearch(ulong8_t*& lhs, size_t sizeOfArray, ulong8_t k) {
   return false;
 }
 
-ulong8_t RSA::findSecret_d() {
+cpp_int_t RSA::findSecret_d() {
   long double tmp_d = 0;
-  for (ulong8_t k = 1; k < this->m_n * 2; k++) {
+  for (cpp_int_t k = 1; k < this->m_n * 2; k++) {
 #ifdef DEBUG
     std::cout << "[DEBUG | encrypt()] k: " << k << std::endl;
 #endif
@@ -120,11 +126,45 @@ ulong8_t RSA::findSecret_d() {
     if (tmp_d - static_cast<unsigned long int>(tmp_d) > 0)
       continue;
     else {
-      this->m_d = static_cast<ulong8_t>(tmp_d);
+      this->m_d = static_cast<ulong8_t >(tmp_d);
       break;
     }
   }
   return this->m_d;
 }
 
+cpp_int_t* RSA::decrypt(cpp_int_t*& encrypted_text, size_t sizeOfArray) {
+#ifdef DEBUG
+  std::cout << "[DEBUG | decrypt()] decrypted: ";
+#endif
+  for (size_t c = 0; c < sizeOfArray; c++)
+    encrypted_text[c] = boost::multiprecision::pow(encrypted_text[c], this->m_d) % this->m_n;
+#ifdef DEBUG
+  std::cout << std::endl;
+#endif
+  return encrypted_text;
+}
+
+cpp_int_t* RSA::addSalt(cpp_int_t*& encrypted_text, size_t sizeOfArray, int secretNum) {
+  cpp_int_t* encryptedWithSalt = new cpp_int_t[sizeOfArray + 1];
+  encryptedWithSalt[0] = secretNum;
+  for (size_t i = 1; i < sizeOfArray + 1; i++)
+    encryptedWithSalt[i] = encrypted_text[i - 1];
+
+  cpp_int_t totalSum = encryptedWithSalt[0];
+
+  for (size_t i = 1; i < sizeOfArray + 1; i++) {
+    totalSum = (encryptedWithSalt[i] + totalSum) % this->m_n;
+    encryptedWithSalt[i] = totalSum;
+  }
+  return encryptedWithSalt;
+}
+
+cpp_int_t* RSA::rmSalt(cpp_int_t*& encrypted_text, size_t sizeOfArray) {
+  auto* tmp = new cpp_int_t[sizeOfArray];
+  tmp[0] = encrypted_text[0];
+  for (size_t i = 1; i < sizeOfArray; i++)
+    tmp[i] = (((encrypted_text[i] - encrypted_text[i - 1]) % this->m_n) + this->m_n) % this->m_n;
+  return tmp;
+}
 

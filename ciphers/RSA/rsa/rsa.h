@@ -28,6 +28,7 @@ private:
   cpp_int_t* src_sieve; // !< source sieve
   bool* sieve_mask; // !< mask with prime nums
   size_t m_cntOfPrimes = 0; // !< count of prime nums in mask
+  cpp_int_t pow_mod(cpp_int_t arg, cpp_int_t power, cpp_int_t module);
   cpp_int_t* getPrimeSequence(ulong8_t n);
   bool isPrime(ulong8_t max, ulong8_t min);
   bool* sieveOfEratosthenes(ulong8_t n);

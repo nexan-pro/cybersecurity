@@ -138,7 +138,7 @@ cpp_int_t* RSA::decrypt(cpp_int_t*& encrypted_text, size_t sizeOfArray) {
   std::cout << "[DEBUG | decrypt()] decrypted: ";
 #endif
   for (size_t c = 0; c < sizeOfArray; c++)
-    encrypted_text[c] = boost::multiprecision::pow(encrypted_text[c], this->m_d) % this->m_n;
+    encrypted_text[c] = pow_mod(encrypted_text[c], this->m_d, this->m_n);
 #ifdef DEBUG
   std::cout << std::endl;
 #endif
@@ -168,3 +168,12 @@ cpp_int_t* RSA::rmSalt(cpp_int_t*& encrypted_text, size_t sizeOfArray) {
   return tmp;
 }
 
+cpp_int_t RSA::pow_mod(cpp_int_t arg, cpp_int_t power, cpp_int_t module) {
+  if (power == 1)
+    return arg % module;
+  cpp_int_t res;
+  res = pow_mod(arg, power / 2, module);
+  res = (res * res) % module;
+  if (power % 2 == 1) res = (res * arg) % module;
+  return res;
+}

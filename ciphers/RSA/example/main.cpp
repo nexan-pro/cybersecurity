@@ -1,10 +1,12 @@
 #include <iostream>
+#include <chrono>
 #include "../rsa/rsa.h"
 
 #define SIZE 6
 
 int main() {
-  RSA rsa(863, 947);
+  auto start = std::chrono::steady_clock::now();
+  RSA rsa(99251, 99257);
   auto msg = new cpp_int_t[SIZE];
   msg[0] = 7;
   msg[1] = 17;
@@ -35,6 +37,10 @@ int main() {
   for (size_t i = 0; i < SIZE + 1; i++)
     std::cout << decryptedValue[i] << ' ';
   std::cout << std::endl;
+
+  auto end = std::chrono::steady_clock::now();
+  std::cout << "Elapsed time(ms): " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()
+            << std::endl;
 
   return 0;
 }

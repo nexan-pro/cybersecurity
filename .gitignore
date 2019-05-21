@@ -6,3 +6,5 @@ ciphers/Vernam/cmake-build-release
 ciphers/RSA/cmake-build-debug
 ciphers/RSA/cmake-build-release
 ciphers/RSA/.idea
+ciphers/Elgamal/.idea
+ciphers/Elgamal/cmake-build-debug

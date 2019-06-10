@@ -1,15 +1,15 @@
 #include "rsa.h"
 
-RSA::RSA(ulong8_t p, ulong8_t q) {
-  ulong8_t max = std::max(p, q);
-  ulong8_t min = (max == p) ? q : p;
+RSA::RSA(ulong512_t p, ulong512_t q) {
+  ulong512_t max = std::max(p, q);
+  ulong512_t min = (max == p) ? q : p;
   if (isPrime(max, min)) {
     this->m_p = p;
     this->m_q = q;
   } else throw std::runtime_error("Error, values of p or q is not prime numbers!");
 }
 
-bool RSA::isPrime(ulong8_t max, ulong8_t min) {
+bool RSA::isPrime(ulong512_t max, ulong512_t min) {
   if (min >= 2) {
     auto primeSequence = getPrimeSequence(max);
     return binarySearch(primeSequence, this->m_cntOfPrimes, max) &&
@@ -17,7 +17,7 @@ bool RSA::isPrime(ulong8_t max, ulong8_t min) {
   } else return false;
 }
 
-cpp_int_t* RSA::getPrimeSequence(ulong8_t n){
+cpp_int_t* RSA::getPrimeSequence(ulong512_t n){
   this->sieve_mask = sieveOfEratosthenes(n);
   this->src_sieve = new cpp_int_t[n + 1];
   for (size_t c = 2; c <= n; c++)
@@ -43,11 +43,23 @@ cpp_int_t* RSA::getPrimeSequence(ulong8_t n){
 cpp_int_t* RSA::encrypt(cpp_int_t*& src_text, size_t sizeOfArray) {
   this->m_n = this->m_p * this->m_q;
   this->m_eFunc = (m_p - 1) * (m_q - 1);
-  for (size_t c = 1; c < this->m_eFunc; c+=2)
-    if (this->m_eFunc % c != 0) {
-      this->m_e = c;
-      break;
+  bool flag = false;
+  int ecx = 0;
+  for (ulong512_t c = 1; c < this->m_n; c+=2) {
+    if (flag) break;
+    if (this->m_eFunc % c != 0) { //TODO: enhancement
+      auto fact_e = factorize(c);
+      for (ulong512_t &it : fact_e)
+        if (this->m_eFunc % it == 0)
+          break;
+        else ecx++;
+      if (ecx == fact_e.size()) {
+        this->m_e = c;
+        flag = true;
+        break;
+      }
     }
+  }
 
 #ifdef DEBUG
   std::cout << "[DEBUG | encrypt()] e: " << this->m_e << std::endl;
@@ -85,7 +97,7 @@ cpp_int_t* RSA::encrypt(cpp_int_t*& src_text, size_t sizeOfArray) {
  * numbers up to any given limit.
  * @see: https://en.wikipedia.org/wiki/Sieve_of_Eratosthenes
  */
-bool* RSA::sieveOfEratosthenes(ulong8_t n) {
+bool* RSA::sieveOfEratosthenes(ulong512_t n) {
   bool* sequence = new bool[n + 1];
   for (size_t i = 0; i <= n; i++)
     sequence[i] = true;
@@ -123,10 +135,10 @@ cpp_int_t RSA::findSecret_d() {
     std::cout << "[DEBUG | encrypt()] k: " << k << std::endl;
 #endif
     tmp_d = static_cast<long double>((k * this->m_eFunc + 1)) / this->m_e;
-    if (tmp_d - static_cast<unsigned long int>(tmp_d) > 0)
+    if (tmp_d - static_cast<ulong512_t>(tmp_d) > 0)
       continue;
     else {
-      this->m_d = static_cast<ulong8_t >(tmp_d);
+      this->m_d = static_cast<ulong512_t>(tmp_d);
       break;
     }
   }
@@ -176,4 +188,18 @@ cpp_int_t RSA::pow_mod(cpp_int_t arg, cpp_int_t power, cpp_int_t module) {
   res = (res * res) % module;
   if (power % 2 == 1) res = (res * arg) % module;
   return res;
+}
+
+std::vector<ulong512_t> RSA::factorize(ulong512_t x) {
+  std::vector<ulong512_t> factors;
+  for (ulong512_t i = 2; i <= sqrt(x); i++) {
+    while (x % i == 0) {
+      factors.push_back(i);
+      x /= i;
+    }
+  }
+  if (x != 1)
+    factors.push_back(x);
+
+  return factors;
 }

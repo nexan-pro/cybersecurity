@@ -6,7 +6,7 @@
 
 int main() {
   auto start = std::chrono::steady_clock::now();
-  RSA rsa(99251, 99257);
+  RSA rsa(20999899, 20999767);
   auto msg = new cpp_int_t[SIZE];
   msg[0] = 7;
   msg[1] = 17;

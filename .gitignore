@@ -10,3 +10,7 @@ ciphers/Elgamal/.idea
 ciphers/Elgamal/cmake-build-debug
 signature_schemes/RSA/.idea
 signature_schemes/RSA/cmake-build-debug
+signature_schemes/Elgamal/.idea
+signature_schemes/Elgamal/cmake-build-debug
+protocols/IdWithZeroKnowledge/.idea
+protocols/IdWithZeroKnowledge/cmake-build-debug

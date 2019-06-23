@@ -28,6 +28,7 @@ public:
   uint1024_t pow_mod(uint1024_t arg, uint1024_t power, uint1024_t module);
   uint1024_t gen_V();
   uint1024_t gen_N(uint1024_t lhs, uint1024_t rhs);
+  uint1024_t get_v();
 };
 
 

@@ -64,3 +64,7 @@ uint1024_t Generator::pow_mod(uint1024_t arg, uint1024_t power, uint1024_t modul
   if (power % 2 == 1) res = (res * arg) % module;
   return res;
 }
+
+uint1024_t Generator::get_v() {
+  return this->m_v;
+}

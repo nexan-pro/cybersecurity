@@ -16,7 +16,7 @@ public:
   void sendRandBit(Alice& side_a);
   void set_r(uint1024_t r);
   void set_y(uint1024_t y);
-  void checkForSignalBit();
+  uint1024_t get_x();
 };
 
 

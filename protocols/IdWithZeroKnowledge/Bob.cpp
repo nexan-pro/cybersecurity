@@ -20,6 +20,6 @@ void Bob::set_y(uint1024_t y) {
   this->m_y = y;
 }
 
-void Bob::checkForSignalBit() {
-
+uint1024_t Bob::get_x() {
+  return this->m_x;
 }

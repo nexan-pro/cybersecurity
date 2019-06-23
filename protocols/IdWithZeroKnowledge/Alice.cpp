@@ -34,11 +34,7 @@ uint1024_t Alice::get_bit() {
   return uint1024_t(bit);
 }
 
-uint1024_t Alice::g_y() {
-  return uint1024_t();
-}
-
-uint1024_t Alice::mul(uint1024_t a, uint1024_t b, uint1024_t n) {
+uint1024_t Alice::mul_mod(uint1024_t a, uint1024_t b, uint1024_t n) {
   uint1024_t sum = 0;
   for (uint1024_t i = 0; i < b; i++) {
     sum += a;
@@ -49,5 +45,5 @@ uint1024_t Alice::mul(uint1024_t a, uint1024_t b, uint1024_t n) {
 }
 
 uint1024_t Alice::get_y() {
-  return mul(this->m_r, m_s, m_n);
+  return mul_mod(this->m_r, this->m_s, this->m_n);
 }
